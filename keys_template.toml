@@ -1,0 +1,6 @@
+# put your keys in this file using this format
+# name the file keys.toml
+
+# github personal access token - it's a little hidden
+# https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token
+github_token = "YOUR GITHUB PERSONAL ACCESS TOKEN"

@@ -5,6 +5,14 @@ of trying to bring the VEP project up to date.
 
 These are for my personal use, but are made public for transparency.
 
+## The tools...
+
+1. EEBO_BIB - convert from the EEBO bib I found on the web as XML to a
+   more useful CSV file. While the source of this file is unofficial, it
+   seems a lot more complete than anything else I've seen
+2. TCP_GIT - an aborted attempt to list what the Oxford GitHub repos contain.
+3. File list check - a quick tool for assessing what is in a directory
+
 ## GENERAL NOTES
 
 The source Data files generally go into the "Data Directory".
