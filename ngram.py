@@ -27,8 +27,10 @@ import csv
 # other useful things
 import time
 
+# allows us to create a command line interface
+import argparse
 
-def ngram(dir, *, ext="txt", topN=20):
+def ngram(dir, *, ext="txt", topN=20, outfile="ngrams.csv"):
     # get rid of leading . in extension since the search pattern takes care of it
     if (ext[0]=="."):
         ext = ext[1:]
@@ -38,7 +40,7 @@ def ngram(dir, *, ext="txt", topN=20):
 
     # this actually loads in the files - the vectorizer is the data structure
     startT = time.time()
-    countVectorizer = SFT.CountVectorizer("filename", token_pattern=erin_word_pat)
+    countVectorizer = SFT.CountVectorizer(input="filename", token_pattern=erin_word_pat)
     wordMatrix = countVectorizer.fit_transform(files)
     endT = time.time()
     print("Reading produced a {} matrix with {} non-zeros in {:.2f} seconds".format(wordMatrix.shape,
@@ -66,7 +68,7 @@ def ngram(dir, *, ext="txt", topN=20):
     topGrams = wordMatrix[:,topWords[:topN]].toarray()
 
     # now to write it out
-    with open("ngrams.csv","w",newline='') as fo:
+    with open(outfile,"w",newline='') as fo:
         w = csv.writer(fo)
         # make the header...
         w.writerow(["Document","Total Length"] + [terms[idx] for idx in topWords[:topN]])
@@ -80,3 +82,14 @@ def ngram(dir, *, ext="txt", topN=20):
             w.writerow(row)
 
     return countVectorizer,wordMatrix
+
+# A command line interface...
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="VEP2 simple ngram (word counter) - counts words across a directory")
+    parser.add_argument("directory",help="Path to the directory with files (it does recurse)")
+    parser.add_argument("output_file",help="Name of output CSV file")
+    parser.add_argument("-t","--top",type=int,default=50,help="Number of words to include (top N)")
+    parser.add_argument("-e","--ext",type=str,default="txt",help="file extension to look for (no .)")
+    args = parser.parse_args()
+    print(args)
+    ngram(args.directory, ext=args.ext, topN=args.top, outfile=args.output_file)
