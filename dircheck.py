@@ -9,6 +9,8 @@ import glob
 import pandas
 # need for getting names
 import os
+#provide a CLI
+import argparse
 
 # defaults are on my disk - mainly for testing
 test_dir = "C:\\DigHum\\TCP\\CleanExtractedStandardized"
@@ -28,13 +30,12 @@ c_tn = []
 c_fn = []
 
 # get a list of files, the meta data, and then match...
-def check(*, dir=play_dir, ext=".txt", meta=drama_meta):
+def check(*, dir=play_dir, ext=".txt", meta=drama_meta, downcase=False, suffix=False, rows_to_show=5):
     global c_tn,c_fn
 
     # get file list
     paths = getPaths(dir,ext)
     files = [os.path.splitext(os.path.basename(p))[0] for p in paths]
-    file_set = set(files)
 
     # fetch metadata
     print("Fetching meta data")
@@ -48,8 +49,13 @@ def check(*, dir=play_dir, ext=".txt", meta=drama_meta):
     elif "TCP" in meta.columns:
         textnames = [ t+("" if t[0]=="K" else ".headed") for t in meta["TCP"]]
 
-    # either way, build the set
+    if downcase:
+        textnames = [t.lower() if t else False for t in textnames]
+        files = [f.lower() if f else False for f in files]
+
+    # build the sets - after we have adjusted the names
     textname_set = set([t for t in textnames if t])
+    file_set = set(files)
 
     print("There are {} files in the directory, and {} in the metadata".format(len(files),len(meta)))
 
@@ -57,7 +63,7 @@ def check(*, dir=play_dir, ext=".txt", meta=drama_meta):
     in_meta = []
     not_in_meta = []
     for f in files:
-        if f in textname_set:
+        if f.replace(suffix,"") in textname_set:
             in_meta.append(f)
         else:
             not_in_meta.append(f)
@@ -70,7 +76,7 @@ def check(*, dir=play_dir, ext=".txt", meta=drama_meta):
     rows_without = []
     for i,t in enumerate(textnames):
         if t:
-            if t in file_set:
+            if t+suffix in file_set:
                 rows_with.append(i)
             else:
                 rows_without.append(i)
@@ -80,5 +86,26 @@ def check(*, dir=play_dir, ext=".txt", meta=drama_meta):
 
     # diagnose missing rows
     if rows_without:
-        for ri in rows_without[:5]:
+        for ri in rows_without[:rows_to_show]:
             print("   Row {}: '{}'".format(ri,textnames[ri]))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Check that a directory has a full set of files")
+    parser.add_argument("directory",type=str,help="Path to the directory with files (it does recurse)")
+    parser.add_argument("repo", type=str, help="Repository (either D or T)")
+    parser.add_argument("-e","--ext",type=str,default="txt",help="file extension to look for (no .)")
+    parser.add_argument("-d","--downcase",help="Convert names (both sides) to lower case",action="store_true")
+    parser.add_argument("-s","--suffix",type=str,help="Suffix to add to base names (use = for leading dash)",default="")
+    parser.add_argument("-r","--rows_to_show",type=int,help="Number of missing rows to show",default=5)
+    args = parser.parse_args()
+    repo = None
+    if not(args.repo) or args.repo[0]=="T" or args.repo[0]=="t":
+        repo = tcp_meta
+        print("using TCP repository")
+    elif args.repo[0]=="D" or args.repo[0]=="d":
+        repo = drama_meta
+        print("using Drama repository")
+    print("Downcase",args.downcase)
+    check(dir=args.directory,ext=args.ext,meta=repo,downcase=args.downcase,
+          suffix=args.suffix,rows_to_show=args.rows_to_show)
+
