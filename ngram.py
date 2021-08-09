@@ -30,7 +30,7 @@ import time
 # allows us to create a command line interface
 import argparse
 
-def ngram(dir, *, ext="txt", topN=20, outfile="ngrams.csv"):
+def ngram(dir, *, ext="txt", topN=20, outfile="ngrams.csv",colname="text_name"):
     # get rid of leading . in extension since the search pattern takes care of it
     if (ext[0]=="."):
         ext = ext[1:]
@@ -71,7 +71,7 @@ def ngram(dir, *, ext="txt", topN=20, outfile="ngrams.csv"):
     with open(outfile,"w",newline='') as fo:
         w = csv.writer(fo)
         # make the header...
-        w.writerow(["Document","Total Length"] + [terms[idx] for idx in topWords[:topN]])
+        w.writerow([colname,"total_count"] + [terms[idx] for idx in topWords[:topN]])
 
         # now write out each row...
         for i,doc in enumerate(files):
@@ -80,6 +80,16 @@ def ngram(dir, *, ext="txt", topN=20, outfile="ngrams.csv"):
             for v in topGrams[i]:
                 row.append(0 if doclen==0 or v==0 else float(v)/float(doclen))
             w.writerow(row)
+
+    # write the columns file
+    outfile = os.path.splitext(outfile)[0]+"_cols.csv"
+    with open(outfile,"w",newline='') as fo:
+        w = csv.writer(fo)
+        w.writerow(["column_name", "column_description"])
+        w.writerow([colname,"file name of the text file"])
+        w.writerow(["total_count","total number of tokens (words) in the file"])
+        for i,idx in enumerate(topWords[:topN]):
+            w.writerow([terms[idx],'Fraction of word "{}" (rank {})'.format(terms[idx],i+1)])
 
     return countVectorizer,wordMatrix
 
@@ -90,6 +100,7 @@ if __name__ == '__main__':
     parser.add_argument("output_file",help="Name of output CSV file")
     parser.add_argument("-t","--top",type=int,default=50,help="Number of words to include (top N)")
     parser.add_argument("-e","--ext",type=str,default="txt",help="file extension to look for (no .)")
+    parser.add_argument("-c","--colname",type=str,default="text_name",help="name of title column")
     args = parser.parse_args()
     print(args)
     ngram(args.directory, ext=args.ext, topN=args.top, outfile=args.output_file)
