@@ -7,20 +7,24 @@ These are for my personal use, but are made public for transparency.
 
 ## The tools...
 
-1. EEBO_BIB - convert from the EEBO bib I found on the web as XML to a
-   more useful CSV file. While the source of this file is unofficial, it
-   seems a lot more complete than anything else I've seen
-2. TCP_GIT - an aborted attempt to list what the Oxford GitHub repos contain.
-3. File list check - a quick tool for assessing what is in a directory
+1. `dircheck.py` - a tool for checking a directory against the metadata.
+    also allows checking ZIP files. Good for seeing that a directory is
+    complete and doesn't have extra files.
+2. `ngram.py` - a simple tool for counting words and writing out CSVs of
+    the top N. This is mainly written as an example of how easy it is
+    to load a corpus of SimpleText files.
+3. EEBO_BIB - convert from the EEBO bib I found on the web as XML to a
+    more useful CSV file. While the source of this file is unofficial, it
+    seems a lot more complete than anything else I've seen.
 
 ## GENERAL NOTES
 
 The source Data files generally go into the "Data Directory".
-Since I am not sure about licensing, I will not include them in the repo,
-but the README should say where I got them from, and this file should
-explain why.
+Since I am not sure about licensing, I will not include them in the repo.
 
-## EEBO_BIB
+## Notes on Specific Tools
+
+### EEBO_BIB
 
 Getting information about EEBO is a bit of a pain.
 
