@@ -1,8 +1,10 @@
-# check what files are in a directory
+# check what files are in a directory (even if it is a ZIP)
 # if you have a directory full of XML or CSV or TXT, it's hard to even count how many
 # there are, never mind to see if you have "all" of them (and which set of "all" do
 # you have)
 
+# handle zips
+import zipfile
 # use glob to get file list
 import glob
 # pandas for dealing with metadata
@@ -33,8 +35,18 @@ c_fn = []
 def check(*, dir=play_dir, ext=".txt", meta=drama_meta, downcase=False, suffix=False, rows_to_show=5):
     global c_tn,c_fn
 
+    # get full paths
+    paths = []
+    if dir[-4:]==".zip":
+        with zipfile.ZipFile(dir,"r") as zf:
+            all_paths = zf.namelist()
+            # filter to get the right extension
+            paths = list(filter(lambda f: f[-(len(ext)+1):] == "."+ext, all_paths))
+            print("Total {} files in ZIP. {} are '*.{}'".format(len(all_paths),len(paths),ext))
+    else:
+        paths = getPaths(dir,ext)
+
     # get file list
-    paths = getPaths(dir,ext)
     files = [os.path.splitext(os.path.basename(p))[0] for p in paths]
 
     # fetch metadata
