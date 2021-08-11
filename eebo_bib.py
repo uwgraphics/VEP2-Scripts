@@ -14,7 +14,7 @@ fout = "Outputs/tls-eebo-2021-plus.csv"
 noteTypes = ["keywords","sourceLibrary","langNote","transcriptType"]
 dataFields = ["title","author","pubDate","publisher","pubPlace"]
 
-cols = ["id", "proquest", "isTcp", "tcp", "eeboIS", "type", "pages", "lang"] + noteTypes
+cols = ["id", "proquest", "isTcp", "TCP", "eeboIS", "type", "pages", "lang"] + noteTypes
 
 # this is in case we need to build string names
 NS = "{http://www.w3.org/XML/1998/namespace}"
@@ -52,7 +52,7 @@ tcpTypes = Counter()
 def extract(elem):
     data = {}
     unnused,data["proquest"] = getAttrib(elem,"ref",True)
-    data["isTcp"],data["tcp"] = getAttrib(elem,"n",True)
+    data["isTcp"],data["TCP"] = getAttrib(elem,"n",True)
     data["MARC"],data["id"] = getAttrib(elem,NS+"id",True)
     unnused,data["eeboIS"] = getAttrib(elem,"facs",True)
     data["type"] = getAttrib(elem,"type")
@@ -75,6 +75,7 @@ def extract(elem):
 
 # go through the books...
 
+
 with open(fout,"w",newline="") as fo:
     wr = csv.writer(fo)
     # header row
@@ -87,12 +88,12 @@ with open(fout,"w",newline="") as fo:
             ## if there were multiple splits for the TCP, pick the last one...
             ## we do this here so we can (potentially) handle this more gracefully
             ## (like making an extra record)
-            if data["tcp"] and ":" in data["tcp"]:
-                last = data["tcp"].split(" ")[-1]
+            if data["TCP"] and ":" in data["TCP"]:
+                last = data["TCP"].split(" ")[-1]
                 ni, nt = last.split(":")
-                print("(item {}) Split TCP to [{},{}] - was [{},{}]".format(i,ni,nt,data["isTcp"],data["tcp"]))
+                print("(item {}) Split TCP to [{},{}] - was [{},{}]".format(i,ni,nt,data["isTcp"],data["TCP"]))
                 data["isTcp"] = ni
-                data["tcp"] = nt
+                data["TCP"] = nt
 
             tcpTypes[data["isTcp"]] += 1
             marcTypes[data["MARC"]] += 1
