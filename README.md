@@ -1,4 +1,4 @@
-# Helper Scripts fr VEP 2
+# Helper Scripts for VEP 2
 
 These are some simple Python Scripts that I have written in the process
 of trying to bring the VEP project up to date.
@@ -31,6 +31,7 @@ Getting information about EEBO is a bit of a pain.
 The official version of the metadata from ProQuest 
 https://www.proquest.com/go/tls-eebo
 gives a corrupted xlsx file that Excel cannot repair.
+*Update - they did fix it! But there it doesn't have TCP info*.
 
 This GitHub Repo: https://github.com/lb42/eebo-bib has a good explanation.
 It has tools that would be useful for format conversion.
@@ -51,3 +52,6 @@ that MetaDataBuilder could process, I wrote a tool to convert it to CSV.
 Some records have multiple TCP entries - I am not sure what is up with that.
 The script (arbitrarily) takes the last one. It does report this.
 
+This is handy for the **EEBO** files (not the other parts of TCP), since we 
+can connect from TCP numbers back to Proquest (to get page images), and to 
+get a sense of what newer EEBO files there might be.
