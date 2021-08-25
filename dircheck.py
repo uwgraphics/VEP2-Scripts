@@ -34,7 +34,7 @@ c_fn = []
 
 # get a list of files, the meta data, and then match...
 def check(*, dir=play_dir, ext=".txt", meta=drama_meta, downcase=False, suffix=False,
-          rows_to_show=5, writefile=False):
+          rows_to_show=5, writefile=False, kNotHeaded=False):
     global c_tn,c_fn
 
     # get full paths
@@ -43,8 +43,10 @@ def check(*, dir=play_dir, ext=".txt", meta=drama_meta, downcase=False, suffix=F
         with zipfile.ZipFile(dir,"r") as zf:
             all_paths = zf.namelist()
             # filter to get the right extension
-            paths = list(filter(lambda f: f[-(len(ext)+1):] == "."+ext, all_paths))
-            print("Total {} files in ZIP. {} are '*.{}'".format(len(all_paths),len(paths),ext))
+            # include the suffix
+            match = (suffix if suffix else "") + "." + ext
+            paths = list(filter(lambda f: f[-(len(match)):] == match, all_paths))
+            print("Total {} files in ZIP. {} are '{}'".format(len(all_paths),len(paths),match))
     else:
         paths = getPaths(dir,ext)
 
@@ -61,7 +63,10 @@ def check(*, dir=play_dir, ext=".txt", meta=drama_meta, downcase=False, suffix=F
     if "text_name" in meta.columns:
         textnames = [os.path.splitext(t)[0] if t else False for t in meta["text_name"]]
     elif "TCP" in meta.columns:
-        textnames = [ (t+("" if t[0]=="K" else ".headed")) if t else "" for t in meta["TCP"]]
+        # an obscure artifact - the K files didn't have "headed" in the name
+        # newer versions try to use simpler namings
+        if kNotHeaded:
+            textnames = [ (t+("" if t[0]=="K" else ".headed")) if t else "" for t in meta["TCP"]]
 
     if downcase:
         textnames = [t.lower() if t else False for t in textnames]
